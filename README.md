@@ -1,50 +1,94 @@
-# React + TypeScript + Vite
+### **📌 README.md**
+```md
+# 🛒 Product Inventory Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple **React + Express** dashboard that displays and manages product inventory with sorting and pagination.
 
-Currently, two official plugins are available:
+## 🚀 Features
+✅ **Product Listing** – Displays all products  
+✅ **Sorting** – Sort by name or inventory (ascending/descending)  
+✅ **Pagination** – Navigate between pages with Next/Previous  
+✅ **Loading Skeletons** – Better UX when fetching data  
+✅ **Optimized API** – Supports pagination & sorting  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
+- **Frontend:** React, TypeScript, TailwindCSS, React Query
+- **Backend:** Node.js, Express
+- **Icons:** Lucide React
+- **API Calls:** Fetch API with React Query
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+---
 
-- Configure the top-level `parserOptions` property like this:
+## 🔧 Installation & Setup
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### **1️⃣ Clone the Repo**
+```sh
+git clone https://github.com/Jrmkrishn/GravityInventory.git
+cd GravityInventory
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### **2️⃣ Install Dependencies**
+```sh
+# Install frontend dependencies
+npm install
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+### **3️⃣ Start the Backend**
+```sh
+cd api
+nodemon server.js
 ```
+Server runs at **http://localhost:8000**
+
+### **4️⃣ Start the Frontend**
+```sh
+cd frontend
+npm run dev
+```
+Frontend runs at **http://localhost:5173**
+
+---
+
+## 📡 API Endpoints
+
+### **1️⃣ Fetch Inventory (Paginated)**
+```http
+GET /api/inventory?page=1&limit=5
+```
+#### ✅ **Response Example**
+```json
+{
+  "data": [
+    { "id": 1, "name": "Laptop Pro", "inventory": 155 },
+    { "id": 2, "name": "Wireless Mouse", "inventory": 15 }
+  ],
+  "totalPages": 5,
+  "currentPage": 1,
+  "totalProducts": 25,
+  "success": true,
+  "message": "Inventory fetched successfully!"
+}
+```
+
+---
+
+## 🎨 UI Components
+✅ **Table:** Displays inventory  
+✅ **Sorting Dropdown:** Sort by name/inventory  
+✅ **Pagination Controls:** Next/Previous buttons  
+✅ **Skeleton Loaders:** For smooth UX  
+
+---
+
+## 🛠️ To-Do (Future Enhancements)
+- ✅ Search functionality 🔍
+- ✅ Dark mode 🌙
+- ✅ Editable inventory 📊
+
+---
+
+## 📜 License
+MIT License © 2025 Jayaramkrishnan
+```
+
