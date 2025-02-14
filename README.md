@@ -90,5 +90,5 @@ GET /api/inventory?page=1&limit=5
 
 ## 📜 License
 MIT License © 2025 Jayaramkrishnan
-```
+
 
