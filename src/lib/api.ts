@@ -6,6 +6,7 @@ export const fetchInventory = async () => {
         throw new Error("Error fetching inventory data")
     }
     const { message, data } = await response.json()
+    
     toast.success(message)
     return data
 }
@@ -39,25 +40,30 @@ export const loginUser = async (userData: { username: string, password: string }
     toast.success(message);
     return token;
 }
+export const createUser = async (userData: { username: string; password: string }): Promise<boolean | void> => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_API}/api/create-user`, {
+            method: "POST",
+            body: JSON.stringify(userData),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
 
-export const createUser = async (userData: { username: string, password: string }) => {
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_API}/api/create-user`, {
-        method: "POST",
-        body: JSON.stringify(userData),
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            throw new Error(errorResponse.error || "Error creating user");
+        }
 
-    if (!response.ok) {
-        const errorResponse = await response.json();
-        throw new Error(errorResponse.error || "Error creating user");
+        const { message } = await response.json();
+
+        toast.success(message);
+        return true;
+    } catch (error) {
+        if (error instanceof Error) {
+            toast.error(error.message);
+        } else {
+            toast.error("An unexpected error occurred");
+        }
     }
-
-    const { message } = await response.json();
-
-    toast.success(message);
-    return true;
-
-}
-
+};

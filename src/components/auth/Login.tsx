@@ -3,8 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
-import { toast } from "sonner"
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
+import { useMutation } from "@tanstack/react-query"
+import { loginUser } from "@/lib/api"
+import { localStorageUtil } from "@/lib/utils"
+import { Loader2 } from "lucide-react"
 
 interface UserProps {
     username: string,
@@ -12,16 +15,28 @@ interface UserProps {
 }
 
 const Login = () => {
+    const navigate = useNavigate()
     const form = useForm<UserProps>({
         defaultValues: {
             username: "",
             password: ""
         }
     })
+    const { mutate, isPending } = useMutation({
+        mutationKey: ["login-user"],
+        mutationFn: loginUser,
+        onSuccess: () => {
+            localStorage.setItem("user_name", form.getValues("username"))
+            const lastPage = localStorage.getItem(`${form.getValues("username")}-lastPage`) || "dashboard"
+            navigate(lastPage)
+        },
+        onError: (error) => {
+            console.log(error);
+        }
+    })
 
     const onSubmit = (data: UserProps) => {
-        toast.success("Logged in successfully!")
-        console.log(data);
+        mutate(data)
     }
     return (
         <Card className="max-w-sm w-full">
@@ -61,7 +76,10 @@ const Login = () => {
                             </FormItem>
                         )}></FormField>
                         <Button type="submit" className="w-full cursor-pointer">
-                            Login
+                            {isPending ? <>
+                                <Loader2 className="animate-spin" />
+                                Logging In
+                            </> : "Login"}
                         </Button>
                         <div className="flex items-center justify-center">
                             <span className="text-sm">

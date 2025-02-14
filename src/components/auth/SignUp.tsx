@@ -3,10 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
-import { toast } from "sonner"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { userSchema } from "@/lib/zod"
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
+import { useMutation } from "@tanstack/react-query"
+import { createUser } from "@/lib/api"
+import { Loader2 } from "lucide-react"
 
 interface UserProps {
   username: string,
@@ -14,8 +16,8 @@ interface UserProps {
 }
 
 const SignUp = () => {
+  const navigate = useNavigate()
   const form = useForm<UserProps>(
-
     {
       resolver: zodResolver(userSchema),
       defaultValues: {
@@ -23,10 +25,20 @@ const SignUp = () => {
         password: ""
       }
     })
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["signup-user"],
+    mutationFn: createUser,
+    onSuccess: () => {
+      navigate("/")
+    },
+    onError: (error) => {
+      console.log(error);
+    }
+  })
+
 
   const onSubmit = (data: UserProps) => {
-    toast.success("Created account successfully!")
-    console.log(data);
+    mutate(data)
   }
   return (
     <Card className="max-w-sm w-full">
@@ -64,7 +76,10 @@ const SignUp = () => {
               </FormItem>
             )}></FormField>
             <Button type="submit" className="w-full cursor-pointer">
-              SignUp
+              {isPending ? <>
+                <Loader2 className="animate-spin" />
+                Signing In
+              </> : "Sign Up"}
             </Button>
             <div className="flex items-center justify-center">
               <span className="text-sm">

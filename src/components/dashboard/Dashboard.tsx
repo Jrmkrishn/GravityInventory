@@ -4,7 +4,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { useEffect } from "react"
 import { fetchInventory } from "@/lib/api"
 import { Skeleton } from "../ui/skeleton"
-import { localStorageUtil } from "@/lib/utils"
 
 interface Product {
   id: string
@@ -22,14 +21,11 @@ const Dashboard = () => {
     refetchOnReconnect: true, // Only refetch when the internet is back
   }
   )
-
   useEffect(() => {
-    const data = localStorageUtil.get("preferredGraphType") || "bar"
-    localStorageUtil.set("config", {
-      preferredGraphType: data,
-      lastView: "dashboard"
-    })
+    const username = localStorage.getItem("user_name")
+    localStorage.setItem(`${username}-lastPage`, "dashboard")
   }, [])
+
   return (
     <div className="p-8 space-y-6">
       <div>
@@ -37,7 +33,7 @@ const Dashboard = () => {
         <p className="text-slate-600 mt-2">Overview of current product stock levels</p>
       </div>
       <Card className="overflow-hidden">
-        {isLoading &&
+        {isLoading ?
           <div className="space-y-2 p-2">
             <Skeleton className="w-full h-12" />
             <Skeleton className="w-full h-12" />
@@ -46,28 +42,28 @@ const Dashboard = () => {
             <Skeleton className="w-full h-12" />
             <Skeleton className="w-full h-12" />
             <Skeleton className="w-full h-12" />
-          </div>
-        }
-        <Table >
-          <TableHeader>
-            <TableRow>
-              <TableHead>
-                Product Name
-              </TableHead>
-              <TableHead>
-                Inventory
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {products && products.map((product: Product) => (
-              <TableRow key={product.id}>
-                <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell>{product.inventory}</TableCell>
+          </div> :
+          <Table >
+            <TableHeader>
+              <TableRow>
+                <TableHead>
+                  Product Name
+                </TableHead>
+                <TableHead>
+                  Inventory
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {products && products.map((product: Product) => (
+                <TableRow key={product.id}>
+                  <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell>{product.inventory}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        }
       </Card>
     </div>
   )

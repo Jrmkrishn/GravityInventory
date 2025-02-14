@@ -1,6 +1,7 @@
 import { ChartBar, LayoutDashboard, LogOutIcon } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar"
 import { Link, useLocation, useNavigate } from "react-router"
+import { localStorageUtil } from "@/lib/utils"
 
 const Siderbar = () => {
     const { pathname } = useLocation()
@@ -18,6 +19,8 @@ const Siderbar = () => {
         },
     ]
     const handleLogout = () => {
+        localStorageUtil.remove("authToken")
+        localStorageUtil.remove("user_name")
         navigate("/")
     }
     const logoutUrl = {

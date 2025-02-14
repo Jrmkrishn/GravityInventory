@@ -5,19 +5,23 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-config(); // Load environment variables
+config();
 
 const app = express();
-app.use(cors({ origin: process.env.ORIGIN }));
-app.use(express.json()); // Enable JSON parsing for request bodies
+app.use(cors({ origin: process.env.ORIGIN || ["http://localhost:3000", "http://127.0.0.1:3000"] }));
+app.use(express.json());
 
-// Connect to MongoDB
+const PORT = process.env.PORT || 8000;
+
 mongoose
-  .connect(process.env.MONGO_URI || "mongodb://localhost:27017/inventoryDB")
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000,
+  })
   .then(() => console.log("Connected to MongoDB"))
   .catch((error) => console.error("MongoDB connection error", error));
 
-// Define Mongoose Schema & Model
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
@@ -25,7 +29,6 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-// Mock Inventory Data
 const products = [
   { id: 1, name: "Laptop Pro", inventory: 45 },
   { id: 2, name: "Wireless Mouse", inventory: 123 },
@@ -34,7 +37,6 @@ const products = [
   { id: 5, name: "USB-C Hub", inventory: 92 },
 ];
 
-// Graph Data
 const groupData = [
   { name: "Jan", value: 400 },
   { name: "Feb", value: 300 },
@@ -44,13 +46,10 @@ const groupData = [
   { name: "Jun", value: 700 },
 ];
 
-// Routes
-
 app.get("/", (req, res) => {
   res.send("Health Check. App running successfully!");
 });
 
-// Get Inventory
 app.get("/api/inventory", (req, res) => {
   res.json({
     data: products,
@@ -59,7 +58,6 @@ app.get("/api/inventory", (req, res) => {
   });
 });
 
-// Get Graph Data
 app.get("/api/graphData", (req, res) => {
   res.json({
     data: groupData,
@@ -68,34 +66,32 @@ app.get("/api/graphData", (req, res) => {
   });
 });
 
-// Create User (Signup)
-app.post("/api/create-user", async (req, res) => {
+app.post("/api/create-user", async (req, res) =>  {
   const { username, password } = req.body;
 
   try {
-    if (!username || !password) {
-      return res.status(400).json({ error: "Username and password are required" });
-    }
+    if(!username || !password) {
+  return res.status(400).json({ error: "Username and password are required" });
+}
 
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ error: "Username already exists" });
-    }
+const existingUser = await User.findOne({ username });
+if (existingUser) {
+  return res.status(400).json({ error: "Username already exists" });
+}
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, password: hashedPassword });
-    await newUser.save();
+const hashedPassword = await bcrypt.hash(password, 10);
+const newUser = new User({ username, password: hashedPassword });
+await newUser.save();
 
-    res.status(201).json({ message: "User created successfully" });
+res.status(201).json({ message: "User created successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Error creating user" });
-  }
+  res.status(500).json({ error: "Error creating user" });
+}
 });
 
-// Login User
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
-
+  console.log(req.body);
   try {
     if (!username || !password) {
       return res.status(400).json({ error: "Username and password are required" });
@@ -119,8 +115,6 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// Start Server
-const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });

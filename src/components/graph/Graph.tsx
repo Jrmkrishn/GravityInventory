@@ -2,7 +2,6 @@ import { fetchGraphData } from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { useEffect, useState } from "react"
-import { localStorageUtil } from "@/lib/utils"
 import { Card } from "../ui/card"
 import {
   Bar,
@@ -21,7 +20,9 @@ type GrapType = "bar" | "line"
 
 
 const Graph = () => {
-  const storedGraphType = localStorage.getItem("preferredGraphType") as GrapType | null;
+  const username = localStorage.getItem("user_name")
+
+  const storedGraphType = localStorage.getItem(`${username}-graphType`) as GrapType | null;
   const [graphType, setGraphType] = useState<GrapType>(storedGraphType ?? "bar")
 
   const { data: graphData, isLoading } = useQuery({
@@ -34,11 +35,9 @@ const Graph = () => {
   }
   )
   useEffect(() => {
-    localStorageUtil.set("config", {
-      preferredGraphType: graphType,
-      lastView: "graph"
-    })
-  }, [])
+    localStorage.setItem(`${username}-lastPage`, "graph")
+    localStorage.setItem(`${username}-graphType`, graphType)
+  }, [graphType])
   return (
     <div className="p-4 space-y-6">
       <div className="flex justify-between">
@@ -59,28 +58,29 @@ const Graph = () => {
         </div>
       </div>
       <Card className="p-4">
-        {isLoading && <Skeleton  className="w-full h-96" />}
-        <div className="h-96">
-          <ResponsiveContainer width={"100%"} height={"100%"}>
-            {graphType == "bar" ?
-              <BarChart data={graphData}>
-                <CartesianGrid strokeDasharray={"3 3"} />
-                <XAxis dataKey={"name"} />
-                <YAxis />
-                <Tooltip  />
-                <Bar dataKey={"value"} fill="#6366f1" stroke="#6366f1" />
-              </BarChart>
-              :
-              <LineChart data={graphData}>
-                <CartesianGrid strokeDasharray={"3 3"} />
-                <XAxis dataKey={"name"} />
-                <YAxis />
-                <Tooltip />
-                <Line type={"monotone"} dataKey={"value"}  stroke="#6366f1" />
-              </LineChart>
-            }
-          </ResponsiveContainer>
-        </div>
+        {isLoading ? <Skeleton className="w-full h-96" /> :
+          <div className="h-96">
+            <ResponsiveContainer width={"100%"} height={"100%"}>
+              {graphType == "bar" ?
+                <BarChart data={graphData}>
+                  <CartesianGrid strokeDasharray={"3 3"} />
+                  <XAxis dataKey={"name"} />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey={"value"} fill="#6366f1" stroke="#6366f1" />
+                </BarChart>
+                :
+                <LineChart data={graphData}>
+                  <CartesianGrid strokeDasharray={"3 3"} />
+                  <XAxis dataKey={"name"} />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type={"monotone"} dataKey={"value"} stroke="#6366f1" />
+                </LineChart>
+              }
+            </ResponsiveContainer>
+          </div>
+        }
       </Card>
     </div>
   )

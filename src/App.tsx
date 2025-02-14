@@ -6,6 +6,7 @@ import SignUp from './components/auth/SignUp.tsx'
 import Dashboard from './components/dashboard/Dashboard.tsx'
 import Graph from './components/graph/Graph.tsx'
 import Home from './components/Home.tsx'
+import NotFound from './components/Not-Found.tsx'
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
           <Route path='dashboard' element={<Dashboard />} />
           <Route path='graph' element={<Graph />} />
         </Route>
+        <Route path='*' element={<NotFound />} ></Route>
       </Routes>
     </div>
   )
