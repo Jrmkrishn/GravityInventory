@@ -13,15 +13,17 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 8000;
 
+// ✅ Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     serverSelectionTimeoutMS: 5000,
   })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((error) => console.error("MongoDB connection error", error));
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((error) => console.error("❌ MongoDB connection error", error));
 
+// ✅ User Schema
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
@@ -29,70 +31,88 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-const products = [
-  { id: 1, name: "Laptop Pro", inventory: 155 },
-  { id: 2, name: "Wireless Mouse", inventory: 15 },
-  { id: 3, name: "4K Monitor", inventory: 28 },
-  { id: 4, name: "Mechanical Keyboard", inventory: 67 },
-  { id: 5, name: "USB-C Hub", inventory: 170 },
-  { id: 6, name: "Gaming Headset", inventory: 45 },
-  { id: 7, name: "Portable SSD 1TB", inventory: 120 },
-  { id: 8, name: "Bluetooth Speaker", inventory: 60 },
-  { id: 9, name: "Ergonomic Chair", inventory: 33 },
-  { id: 10, name: "Smartphone Stand", inventory: 75 },
-  { id: 11, name: "Graphic Tablet", inventory: 20 },
-  { id: 12, name: "Webcam 1080p", inventory: 50 },
-  { id: 13, name: "Wireless Earbuds", inventory: 90 },
-  { id: 14, name: "Standing Desk", inventory: 25 },
-  { id: 15, name: "VR Headset", inventory: 10 },
-  { id: 16, name: "HDMI Cable (6ft)", inventory: 200 },
-  { id: 17, name: "Smartwatch", inventory: 40 },
-  { id: 18, name: "External Hard Drive 2TB", inventory: 85 },
-  { id: 19, name: "Noise-Cancelling Headphones", inventory: 55 },
-  { id: 20, name: "Wireless Charging Pad", inventory: 110 }
-];
+
+// ✅ Product Schema
+const productSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  inventory: { type: Number, required: true },
+});
+
+export const Product = mongoose.model("Product", productSchema);
+
+// ✅ Graph Data Schema
+const graphSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  value: { type: Number, required: true },
+});
+
+export const GraphData = mongoose.model("GraphData", graphSchema);
 
 
-const groupData = [
-  { name: "Jan", value: 400 },
-  { name: "Feb", value: 300 },
-  { name: "Mar", value: 600 },
-  { name: "Apr", value: 800 },
-  { name: "May", value: 500 },
-  { name: "Jun", value: 700 },
-];
-
+// ✅ Health Check
 app.get("/", (req, res) => {
   res.send("Health Check. App running successfully!");
 });
 
-app.get("/api/inventory", (req, res) => {
-  const page = parseInt(req.query.page) || 1; 
-  const limit = parseInt(req.query.limit) || 8; 
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
+// ✅ Fetch Inventory (Paginated from MongoDB)
+app.get("/api/inventory", async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 8;
+  
+  try {
+    const totalProducts = await Product.countDocuments();
+    const totalPages = Math.ceil(totalProducts / limit);
 
-  const paginatedProducts = products.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(products.length / limit);
+    const products = await Product.find()
+      .skip((page - 1) * limit)
+      .limit(limit);
 
-  res.json({
-    data: paginatedProducts,
-    totalPages,
-    currentPage: page,
-    totalProducts: products.length,
-    success: true,
-    message: "Inventory fetched successfully!",
-  });
+    res.json({
+      data: products,
+      totalPages,
+      currentPage: page,
+      totalProducts,
+      success: true,
+      message: "Inventory fetched successfully!",
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching inventory" });
+  }
 });
 
-app.get("/api/graphData", (req, res) => {
-  res.json({
-    data: groupData,
-    success: "success",
-    message: "Graph data fetched successfully!",
-  });
+// ✅ Add New Product to Database
+app.post("/api/products", async (req, res) => {
+  const { name, inventory } = req.body;
+
+  try {
+    if (!name || inventory == null) {
+      return res.status(400).json({ error: "Product name and inventory are required" });
+    }
+
+    const newProduct = new Product({ name, inventory });
+    await newProduct.save();
+
+    res.status(201).json({ message: "Product added successfully", product: newProduct });
+  } catch (error) {
+    res.status(500).json({ error: "Error adding product" });
+  }
 });
 
+// ✅ Fetch Graph Data from MongoDB
+app.get("/api/graphData", async (req, res) => {
+  try {
+    const graphData = await GraphData.find();
+    res.json({
+      data: graphData,
+      success: true,
+      message: "Graph data fetched successfully!",
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching graph data" });
+  }
+});
+
+// ✅ User Registration
 app.post("/api/create-user", async (req, res) => {
   const { username, password } = req.body;
 
@@ -116,9 +136,9 @@ app.post("/api/create-user", async (req, res) => {
   }
 });
 
+// ✅ User Login
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
-  console.log(req.body);
   try {
     if (!username || !password) {
       return res.status(400).json({ error: "Username and password are required" });
@@ -142,6 +162,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+// ✅ Start Server
 app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
+  console.log(`🚀 Server listening on http://localhost:${PORT}`);
 });
