@@ -28,6 +28,7 @@ const Graph = () => {
   const { data: graphData, isLoading } = useQuery({
     queryKey: ["graph"],
     queryFn: fetchGraphData,
+    enabled: !!username,
     staleTime: 5 * 60 * 1000, // Fresh for 5 min
     refetchOnMount: false, // No unnecessary refetching
     refetchOnWindowFocus: false, // Doesn't refetch on tab switch
@@ -57,7 +58,7 @@ const Graph = () => {
           </Select>
         </div>
       </div>
-      <Card className="p-4">
+      <Card className="p-2 md:p-4">
         {isLoading ? <Skeleton className="w-full h-96" /> :
           <div className="h-96">
             <ResponsiveContainer width={"100%"} height={"100%"}>

@@ -3,9 +3,8 @@ import { Outlet, useNavigate } from 'react-router'
 
 const AuthLayout = () => {
     const navigate = useNavigate()
-
+    const token = localStorage.getItem("authToken")
     useEffect(() => {
-        const token = localStorage.getItem("authToken")
         if (token) {
             const username = localStorage.getItem("user_name")
             console.log(`${username}-lastPage`);
@@ -13,7 +12,7 @@ const AuthLayout = () => {
             navigate(lastPage)
         }
     }, [])
-    return (
+    return !token && (
         <div className='w-full h-screen flex justify-center items-center'>
             <Outlet />
         </div>

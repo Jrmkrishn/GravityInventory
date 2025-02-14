@@ -35,8 +35,6 @@ const SignUp = () => {
       console.log(error);
     }
   })
-
-
   const onSubmit = (data: UserProps) => {
     mutate(data)
   }
@@ -57,7 +55,7 @@ const SignUp = () => {
                   Username
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Username" {...field} />
+                  <Input id="username" placeholder="Username" {...field} />
                 </FormControl>
                 <FormMessage />
 
@@ -65,11 +63,11 @@ const SignUp = () => {
             )}></FormField>
             <FormField name="password" control={form.control} render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="password">
+                <FormLabel  htmlFor="password">
                   Password
                 </FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="Password" {...field} />
+                  <Input type="password" id="password" placeholder="Password" {...field} />
                 </FormControl>
                 <FormMessage />
 

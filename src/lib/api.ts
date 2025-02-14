@@ -1,14 +1,14 @@
 import { toast } from "sonner";
 
-export const fetchInventory = async () => {
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_API}/api/inventory`)
+export const fetchInventory = async (page: number) => {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_API}/api/inventory?page=${page}`,)
     if (!response.ok) {
         throw new Error("Error fetching inventory data")
     }
-    const { message, data } = await response.json()
-    
+    const { message, data, totalPages, currentPage } = await response.json()
+
     toast.success(message)
-    return data
+    return { totalPages, data, currentPage }
 }
 export const fetchGraphData = async () => {
     const response = await fetch(`${import.meta.env.VITE_BACKEND_API}/api/graphData`)

@@ -12,7 +12,7 @@ function App() {
 
   return (
     <div className='w-full h-full'>
-      <div className="grid-background"></div>
+      <div className="dark:grid-background"></div>
       <Routes>
         <Route element={<AuthLayout />}>
           <Route index element={<Login />} />

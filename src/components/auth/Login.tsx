@@ -6,8 +6,8 @@ import { Button } from "../ui/button"
 import { Link, useNavigate } from "react-router"
 import { useMutation } from "@tanstack/react-query"
 import { loginUser } from "@/lib/api"
-import { localStorageUtil } from "@/lib/utils"
 import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 interface UserProps {
     username: string,
@@ -32,6 +32,7 @@ const Login = () => {
         },
         onError: (error) => {
             console.log(error);
+            toast.error(error?.message)
         }
     })
 
@@ -55,7 +56,7 @@ const Login = () => {
                                     Username
                                 </FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Username" {...field} />
+                                    <Input id="username" placeholder="Username" {...field} />
                                 </FormControl>
                                 <FormMessage >
                                     {form.formState.errors.username?.message}
@@ -68,7 +69,7 @@ const Login = () => {
                                     Password
                                 </FormLabel>
                                 <FormControl>
-                                    <Input type="password" placeholder="Password" {...field} />
+                                    <Input id="password" type="password" placeholder="Password" {...field} />
                                 </FormControl>
                                 <FormMessage >
                                     {form.formState.errors.password?.message}
